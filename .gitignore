@@ -1,0 +1,20 @@
+# ── Personal data (knowledge files with PII) ──
+rag/
+
+# ── Environment / secrets ──
+.env
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# ── ChromaDB local data ──
+chroma_data/
+
+# ── OS ──
+.DS_Store
+Thumbs.db
