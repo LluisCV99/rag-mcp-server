@@ -1,0 +1,51 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# RAG MCP Server — Docker Compose
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# Usage:
+#   docker compose up --build -d        # Build and start
+#   docker compose logs -f rag-mcp      # Watch ingestion + server logs
+#   docker compose down -v              # Stop and remove volumes
+#
+# ═══════════════════════════════════════════════════════════════════════════════
+
+services:
+  # ── ChromaDB vector database ──────────────────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: rag-chromadb
+    ports:
+      - "${CHROMA_PORT:-18484}:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - ANONYMIZED_TELEMETRY=false
+
+  # ── RAG MCP Server ────────────────────────────────────────────────────────
+  rag-mcp:
+    build: .
+    container_name: rag-mcp-server
+    ports:
+      - "${MCP_PORT:-18485}:${MCP_PORT:-18485}"
+    volumes:
+      - ./rag:/data/rag:ro    # Mount knowledge files (read-only)
+    depends_on:
+      chromadb:
+        condition: service_started
+    environment:
+      # ── ChromaDB connection ──
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000                          # Internal port (container-to-container)
+      # ── Ingestion params ──
+      - COLLECTION_NAME=${COLLECTION_NAME:-rag_knowledge}
+      - RAG_DIR=/data/rag
+      - CHUNK_SIZE=${CHUNK_SIZE:-800}
+      - CHUNK_OVERLAP=${CHUNK_OVERLAP:-120}
+      - FILE_EXTENSIONS=${FILE_EXTENSIONS:-.md,.txt}
+      # ── MCP server params ──
+      - MCP_PORT=${MCP_PORT:-18485}
+      - MCP_HOST=0.0.0.0
+      - MCP_SERVER_NAME=${MCP_SERVER_NAME:-RAG Knowledge Server}
+
+volumes:
+  chroma_data:
