@@ -1,8 +1,16 @@
 # RAG MCP Server
 
+[![Docker Hub](https://img.shields.io/docker/v/lluiscv99/rag-mcp-server?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/lluiscv99/rag-mcp-server)
+
 A dockerized **RAG (Retrieval-Augmented Generation) MCP server** that ingests your knowledge files into a vector database and exposes semantic search via the [Model Context Protocol](https://modelcontextprotocol.io).
 
 Any MCP-compatible agent (Claude Desktop, Cursor, Gemini, custom agents…) can connect and query your knowledge base.
+
+### Docker Hub
+
+```bash
+docker pull lluiscv99/rag-mcp-server:latest
+```
 
 ## Architecture
 
